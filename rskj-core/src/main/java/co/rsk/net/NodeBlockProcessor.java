@@ -20,10 +20,12 @@ package co.rsk.net;
 
 import co.rsk.config.RskSystemProperties;
 import co.rsk.net.messages.*;
-import org.ethereum.core.*;
+import co.rsk.net.sync.SyncConfiguration;
+import org.ethereum.core.Block;
+import org.ethereum.core.BlockHeader;
+import org.ethereum.core.BlockIdentifier;
+import org.ethereum.core.Blockchain;
 import org.ethereum.db.ByteArrayWrapper;
-import org.ethereum.manager.WorldManager;
-import org.ethereum.net.server.ChannelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -47,33 +49,10 @@ public class NodeBlockProcessor implements BlockProcessor {
     private final Blockchain blockchain;
     private final BlockNodeInformation nodeInformation; // keep tabs on which nodes know which blocks.
     private final BlockSyncService blockSyncService;
+    private SyncConfiguration syncConfiguration;
     private final Map <Long, byte[]> skeletonCache = new HashMap<>();
-    private final ChannelManager channelManager;
 
     private long blocksForPeers;
-
-    /**
-     * Creates a new NodeBlockProcessor using the given BlockStore and Blockchain.
-     *
-     * @param store        A BlockStore to store the blocks that are not ready for the Blockchain.
-     * @param blockchain   The blockchain in which to insert the blocks.
-     * @param nodeInformation
-     * @param channelManager
-     * @param blockSyncService
-     */
-    public NodeBlockProcessor(
-            @Nonnull final BlockStore store,
-            @Nonnull final Blockchain blockchain,
-            @Nonnull final BlockNodeInformation nodeInformation,
-            @Nonnull final ChannelManager channelManager,
-            @Nonnull final BlockSyncService blockSyncService) {
-        this.store = store;
-        this.blockchain = blockchain;
-        this.nodeInformation = nodeInformation;
-        this.channelManager = channelManager;
-        this.blocksForPeers = RskSystemProperties.CONFIG.getBlocksForPeers();
-        this.blockSyncService = blockSyncService;
-    }
 
     /**
      * Creates a new NodeBlockProcessor using the given BlockStore and Blockchain.
@@ -85,13 +64,14 @@ public class NodeBlockProcessor implements BlockProcessor {
             @Nonnull final BlockStore store,
             @Nonnull final Blockchain blockchain,
             @Nonnull final BlockNodeInformation nodeInformation,
-            @Nonnull final BlockSyncService blockSyncService) {
+            @Nonnull final BlockSyncService blockSyncService,
+            @Nonnull final SyncConfiguration syncConfiguration) {
         this.store = store;
         this.blockchain = blockchain;
         this.nodeInformation = nodeInformation;
         this.blockSyncService = blockSyncService;
+        this.syncConfiguration = syncConfiguration;
         this.blocksForPeers = RskSystemProperties.CONFIG.getBlocksForPeers();
-        this.channelManager = null;
     }
 
     @Override

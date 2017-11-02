@@ -21,6 +21,7 @@ package co.rsk.net;
 import co.rsk.blockchain.utils.BlockGenerator;
 import co.rsk.net.messages.BlockMessage;
 import co.rsk.net.simples.SimpleAsyncNode;
+import co.rsk.net.sync.SyncConfiguration;
 import co.rsk.test.World;
 import co.rsk.validators.DummyBlockValidationRule;
 import org.ethereum.core.Block;
@@ -45,8 +46,9 @@ public class TwoAsyncNodeTest {
             blockchain.tryToConnect(b);
 
         BlockNodeInformation nodeInformation = new BlockNodeInformation();
-        BlockSyncService blockSyncService = new BlockSyncService(store, blockchain, nodeInformation, null);
-        NodeBlockProcessor processor = new NodeBlockProcessor(store, blockchain, nodeInformation, blockSyncService);
+        SyncConfiguration syncConfiguration = SyncConfiguration.IMMEDIATE_FOR_TESTING;
+        BlockSyncService blockSyncService = new BlockSyncService(store, blockchain, nodeInformation, syncConfiguration, null);
+        NodeBlockProcessor processor = new NodeBlockProcessor(store, blockchain, nodeInformation, blockSyncService, syncConfiguration);
         NodeMessageHandler handler = new NodeMessageHandler(processor, null, null, null, null, null, new DummyBlockValidationRule());
 
         return new SimpleAsyncNode(handler);
@@ -63,8 +65,9 @@ public class TwoAsyncNodeTest {
             blockchain.tryToConnect(b);
 
         BlockNodeInformation nodeInformation = new BlockNodeInformation();
-        BlockSyncService blockSyncService = new BlockSyncService(store, blockchain, nodeInformation, null);
-        NodeBlockProcessor processor = new NodeBlockProcessor(store, blockchain, nodeInformation, blockSyncService);
+        SyncConfiguration syncConfiguration = SyncConfiguration.IMMEDIATE_FOR_TESTING;
+        BlockSyncService blockSyncService = new BlockSyncService(store, blockchain, nodeInformation, syncConfiguration, null);
+        NodeBlockProcessor processor = new NodeBlockProcessor(store, blockchain, nodeInformation, blockSyncService, syncConfiguration);
         NodeMessageHandler handler = new NodeMessageHandler(processor, null, null, null, null, null, new DummyBlockValidationRule());
 
         return new SimpleAsyncNode(handler);
